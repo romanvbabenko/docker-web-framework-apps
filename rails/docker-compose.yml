@@ -1,0 +1,47 @@
+version: '3.7'
+
+x-default: &default
+  build:
+    context: .
+    dockerfile: ./Dockerfile
+    args:
+      NODE_MAJOR_VERSION: '10'
+      GECKODRIVER_VERSION: '0.26.0'
+  image: halo:0.1.0
+  stdin_open: true # ???
+  tty: true        # ???
+  volumes:
+    - .:/app:cached
+    - rails_cache:/app/tmp/cache
+    - bundle:/bundle
+  environment:
+    - DATABASE_URL=postgres://postgres:postgres@db:5432
+  depends_on:
+    - db
+
+services:
+  db:
+    image: postgres:9.5.21-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: '${POSTGRES_DB:-postgres}'
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  runner:
+    <<: *default
+    command: /bin/bash
+
+  app:
+    <<: *default
+    command: bundle exec rails server -b 0.0.0.0
+    ports:
+      - '3000:3000'
+  features:
+    <<: *default
+    command: bundle exec rspec spec/features
+volumes:
+  rails_cache: {}
+  bundle: {}
+  db: {}

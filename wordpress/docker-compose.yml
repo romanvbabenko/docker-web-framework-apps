@@ -1,0 +1,58 @@
+version: '3.1'
+
+services:
+  app.local:
+    image: 'wordpress:${WP_VERSION:-5.1.1}-php${PHP_VERSION:-7.2}-apache'
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: exampledb
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_CONFIG_EXTRA: |
+        /* Post Revisions */
+        define('WP_POST_REVISIONS', false );
+        define('AUTOSAVE_INTERVAL', 300 ); // seconds
+    volumes:
+      - data:/var/www/html
+    ports:
+      - 80:80
+    depends_on:
+      - db
+  db:
+    image: mysql:5.6.36
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - data:/var/lib/mysql
+  installer:
+    image: 'wordpress:cli-${WP_CLI_VERSION:-2.4.0}-php${PHP_VERSION:-7.2}'
+    user: xfs
+    environment:
+      WP_CORE_TITLE: '${WP_CORE_TITLE:-Yet another Wordpres Blog}'
+      WP_CORE_URL: 'http://app.local'
+      WP_CORE_ADMIN_USER: '${WP_CORE_ADMIN_USER:-admin}'
+      WP_CORE_ADMIN_USER_PASSWORD: '${WP_CORE_ADMIN_USER_PASSWORD:-admin}'
+      WP_CORE_ADMIN_EMAIL: '${WP_CORE_ADMIN_EMAIL:-admin@example.com}'
+      WP_CORE_EXTRA: '${WP_CORE_EXTRA:- --skip-email}'
+    command: >
+      /bin/sh -c 'wp core install --title="$${WP_CORE_TITLE}" --url=$${WP_CORE_URL} --admin_user=$${WP_CORE_ADMIN_USER} \
+          --admin_password=$${WP_CORE_ADMIN_USER_PASSWORD} --admin_email=$${WP_CORE_ADMIN_EMAIL} $${WP_CORE_EXTRA}'
+    volumes:
+      - data:/var/www/html
+    depends_on:
+      - app.local
+  spec:
+    build: .
+    environment:
+      SPEC_WP_HOST: http://app.local
+      SPEC_DRIVER: selenium_headless
+    command: rspec
+    depends_on:
+      - app.local
+volumes:
+  data: {}

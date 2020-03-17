@@ -1,0 +1,59 @@
+dist: xenial
+language: sh
+services:
+  - docker
+env:
+  global:
+    - DOCKER_COMPOSE_VERSION=1.25.1 JQ_VERSION=1.6
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - curl -L https://github.com/stedolan/jq/releases/download/jq-${JQ_VERSION}/jq-linux64 > jq
+  - chmod +x jq
+  - sudo mv jq /usr/local/bin
+
+script:
+  - cd create-react-app
+  - docker-compose up -d --build
+  - >
+    curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/users
+    | grep -q '200'
+    && (echo 'HTTP test: PASS' && exit 0)
+    || (echo 'HTTP test: FAIL' && exit 1)
+  - >
+    curl -s localhost:8000/api/users | jq '. | length'
+    | grep -q '10' && (echo 'HTTP[JSON] test: PASS' && exit 0)
+    || (echo 'HTTP[JSON] test: FAIL' && exit 1)
+  - docker-compose down -v
+
+  - cd ../ruby-grape
+  - docker-compose up -d --build
+  - sleep 10
+  - >
+    curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/users
+    | grep -q '200'
+    && (echo 'HTTP test: PASS' && exit 0)
+    || (echo 'HTTP test: FAIL' && exit 1)
+  - >
+    curl -s localhost:8000/api/users | jq '. | length'
+    | grep -q '3' && (echo 'HTTP[JSON] test: PASS' && exit 0)
+    || (echo 'HTTP[JSON] test: FAIL' && exit 1)
+  - MINIMUM_COVERAGE=95 docker-compose run app rspec
+  - docker-compose down -v
+
+  - cd ../wordpress
+  - docker-compose up -d app.local
+  - sleep 15
+  - docker-compose run installer
+  - docker-compose run spec
+  - docker-compose down --volumes
+
+  - cd ../rails
+  - docker-compose run --rm runner bundle
+  - docker-compose run --rm runner yarn
+  - docker-compose run --rm runner bundle exec rake db:setup
+  - docker-compose run --rm runner bundle exec rspec
+  - docker-compose down --volumes

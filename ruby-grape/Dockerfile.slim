@@ -1,0 +1,9 @@
+FROM ruby:2.6.5-alpine
+WORKDIR /app
+COPY Gemfile* ./
+COPY app.rb config.ru ./
+RUN apk --no-cache --quiet add build-base && \
+      gem install bundler -v=2.1.4 && bundle config set without 'development test' && \
+      bundle --quiet -j 2 && \
+    apk --quiet del build-base
+CMD rackup --port 8000 --host 0.0.0.0 --env production
