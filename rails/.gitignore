@@ -40,4 +40,5 @@ NOTES.md
 !.gitignore
 !.rspec
 !.ruby-version
+!.rubocop.yml
 !.simplecov

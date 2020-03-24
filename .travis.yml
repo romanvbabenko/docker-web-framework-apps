@@ -55,5 +55,6 @@ script:
   - docker-compose run --rm runner bundle
   - docker-compose run --rm runner yarn
   - docker-compose run --rm runner bundle exec rake db:setup
+  - docker-compose run --rm runner bundle exec rubocop
   - docker-compose run --rm runner bundle exec rspec
   - docker-compose down --volumes

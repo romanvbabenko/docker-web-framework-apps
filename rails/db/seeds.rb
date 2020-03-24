@@ -12,7 +12,9 @@ ActiveRecord::Base.connection.tables.each do |t|
 end
 
 require 'factory_bot_rails'
+# rubocop:disable Style/MixinUsage
 include FactoryBot::Syntax::Methods
+# rubocop:enable Style/MixinUsage
 
 User.transaction do
   15.times { create(:user) }
