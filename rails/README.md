@@ -2,7 +2,7 @@
 
 This is ready-to-use developed with Rails, Docker best practices application integrated with ReactJS which can be used as a guide for your next explorations.
 
-NOTE: Keep in mind that the image was created as an example for the development and testing purposes.
+NOTE: Keep in mind that the Docker image was created as an example for the development and testing purposes.
 
 ## Requirements
 
