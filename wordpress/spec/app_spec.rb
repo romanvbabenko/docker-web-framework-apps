@@ -3,7 +3,7 @@ require 'capybara/rspec'
 SPEC_WP_HOST = ENV.fetch('SPEC_WP_HOST', 'http://app.local:80')
 SPEC_DRIVER  = ENV.fetch('SPEC_DRIVER', 'selenium')
 
-describe '', type: :feature, driver: SPEC_DRIVER.to_sym do
+describe 'WordPress app smoke test', type: :feature, driver: SPEC_DRIVER.to_sym do
   it 'has correct blog title' do
     visit SPEC_WP_HOST
 
