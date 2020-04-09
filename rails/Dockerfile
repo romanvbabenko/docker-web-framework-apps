@@ -1,4 +1,5 @@
-FROM ruby:2.6.5
+ARG RUBY_VERSION=2.6.5
+FROM ruby:$RUBY_VERSION
 
 ARG NODE_MAJOR_VERSION=10
 ARG YARN_VERSION=1.22.4
@@ -21,7 +22,8 @@ ENV BUNDLE_PATH $GEM_HOME
 ENV BUNDLE_APP_CONFIG=$BUNDLE_PATH
 
 ARG BUNDLER_VERSION=2.1.4
-RUN gem update --quiet --system && gem install --quiet bundler:$BUNDLER_VERSION
+ARG UPDATE_RUBYGEMS=yes
+RUN bash -c '[[ "${UPDATE_RUBYGEMS}" = "yes" ]] && gem update --quiet --system' || gem install --quiet bundler:$BUNDLER_VERSION
 
 WORKDIR /app
 

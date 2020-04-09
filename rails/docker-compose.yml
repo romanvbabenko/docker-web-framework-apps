@@ -5,6 +5,9 @@ x-default: &default
     context: .
     dockerfile: ./Dockerfile
     args:
+      RUBY_VERSION: '2.3.0'
+      UPDATE_RUBYGEMS: 'no'
+      BUNDLER_VERSION: '1.13.1'
       NODE_MAJOR_VERSION: '10'
       GECKODRIVER_VERSION: '0.26.0'
   image: halo:0.1.0
