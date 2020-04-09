@@ -23,7 +23,7 @@ ENV BUNDLE_APP_CONFIG=$BUNDLE_PATH
 
 ARG BUNDLER_VERSION=2.1.4
 ARG UPDATE_RUBYGEMS=yes
-RUN bash -c '[[ "${UPDATE_RUBYGEMS}" = "yes" ]] && gem update --quiet --system' || gem install --quiet bundler:$BUNDLER_VERSION
+RUN bash -c '[[ "${UPDATE_RUBYGEMS}" = "yes" ]] && gem update --quiet --system' || gem install --quiet bundler -v=$BUNDLER_VERSION
 
 WORKDIR /app
 
