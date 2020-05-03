@@ -1,11 +1,14 @@
-FROM ruby:2.6.5
+ARG RUBY_VERSION=2.6.5
+FROM ruby:${RUBY_VERSION}
 
-ARG NODE_MAJOR_VERSION=10
+ARG NODE_MAJOR_VERSION=12
 ARG YARN_VERSION=1.22.4
 ARG GECKODRIVER_VERSION=0.25.0
 
+ENV NODE_PATH=/node_modules
+
 RUN curl -sL https://deb.nodesource.com/setup_${NODE_MAJOR_VERSION}.x | bash -
-RUN apt-get update && apt-get install -y build-essential nodejs
+RUN apt-get -qqy update && apt-get -qqy install build-essential nodejs
 RUN curl -o- -sL https://yarnpkg.com/install.sh | bash -s -- --version ${YARN_VERSION}
 
 RUN wget -q https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz && \

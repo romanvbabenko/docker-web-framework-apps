@@ -14,6 +14,7 @@ x-default: &default
     - .:/app:cached
     - rails_cache:/app/tmp/cache
     - bundle:/bundle
+    - node_modules:/node_modules
   environment:
     - DATABASE_URL=postgres://postgres:postgres@db:5432
   depends_on:
@@ -44,4 +45,5 @@ services:
 volumes:
   rails_cache: {}
   bundle: {}
+  node_modules: {}
   db: {}
